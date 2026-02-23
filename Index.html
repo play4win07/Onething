@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Special Message</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            /* Anti-Copy & Anti-Select */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow-x: hidden;
+            padding: 20px;
+            background: linear-gradient(-45deg, #1a0b2e, #3a1c71, #d76d77, #ffaf7b, #11051c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+        }
+
+        /* Full Screen Earphone Warning Overlay */
+        #earphoneModal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 5, 20, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .headphone-icon {
+            font-size: 70px;
+            color: #ff7eb3;
+            margin-bottom: 20px;
+            animation: floatUpDown 2s infinite ease-in-out;
+        }
+
+        #earphoneModal h2 { margin-bottom: 10px; font-size: 1.8rem; }
+        #earphoneModal p { color: #ccc; margin-bottom: 30px; font-size: 1rem; }
+
+        /* General Card Style */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 40px 30px;
+            border-radius: 24px;
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Animations */
+        .slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUpAnim 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        
+        @keyframes slideUpAnim { to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Inputs & Buttons */
+        input[type="password"] {
+            width: 100%; padding: 14px; margin-bottom: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px; outline: none; font-size: 16px;
+            background: rgba(0, 0, 0, 0.2); color: white; text-align: center;
+        }
+        
+        button {
+            background: linear-gradient(90deg, #ff7eb3, #ff758c);
+            color: white; border: none; padding: 14px 40px;
+            border-radius: 50px; font-size: 17px; font-weight: 700;
+            cursor: pointer; width: 100%; box-shadow: 0 5px 15px rgba(255, 117, 140, 0.3);
+        }
+
+        .error-text { color: #ff6b6b; font-size: 14px; min-height: 20px; margin-bottom: 15px; }
+
+        /* Message Screen & Player */
+        .title-msg { font-size: 2rem; color: #fff; margin-bottom: 15px; }
+        .highlight-name { color: #ff7eb3; text-shadow: 0 0 10px rgba(255, 126, 179, 0.3); }
+        .main-confession { font-size: 2.2rem; margin: 25px 0; color: #fff; text-shadow: 0 0 20px rgba(255, 117, 140, 0.8); }
+
+        /* Custom Music Player */
+        .music-player {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .play-btn {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: #ff7eb3;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            flex-shrink: 0;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .time-display {
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            color: #ccc;
+        }
+
+        /* Range Slider Styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px; height: 15px;
+            border-radius: 50%;
+            background: #ff7eb3;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="earphoneModal">
+        <i class="fas fa-headphones-alt headphone-icon"></i>
+        <h2>Earphones Required</h2>
+        <p>Please earphones laga lo aur Shaanti Se Padho. ❤️</p>
+        <button onclick="startExperience()" style="max-width: 200px;">Okay, Ready!</button>
+    </div>
+
+    <audio id="bgMusic" src="music.mp3"></audio>
+
+    <div id="loginScreen" class="card hidden">
+        <div style="font-size: 45px; color: #ff7eb3; margin-bottom: 20px;"><i class="fas fa-lock"></i></div>
+        <h2> Message Locked</h2>
+        <p style="margin-bottom: 20px; opacity: 0.8;">Just Only For You.</p>
+        
+        <input type="password" id="passwordInput" placeholder="Enter Password">
+        <p id="errorMessage" class="error-text"></p>
+        
+        <button onclick="checkPassword()">Unlock <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    <div id="messageScreen" class="card hidden">
+        <h1 class="title-msg slide-up">Hi <span class="highlight-name">Nisha</span>,</h1>
+        
+        <p class="slide-up delay-1" style="font-size: 1.05rem; line-height: 1.6;">
+            Kafi Time se mein ek baat Batana Chahta Tha par Bata nahi paa raha tha to aaj himmat karke bata raha hu, Mujhe Nahi Pata ki tum Iske bad kya sochogi and Kya Reaction hoga, Please Gussa Ya Hate mat dena I Am Just share My Feelings For You.
+        </p>
+        
+        <h2 class="main-confession slide-up delay-2">I Like You. ❤️</h2>
+        
+        <p class="slide-up delay-3" style="font-size: 0.95rem; opacity: 0.9;">
+            I am Feeling Special for You. bas mujhe apni feelings ko azaad karna tha. kyunki me thoda mental patient hu to jyada stress nahi rakh sakta to bura lage to sorry and baki bas aur ek bar fir se sorry agar thoda sa bhi kharab lage to and isse jyada me aur kuch nhi bol paunga.
+            🙂 Really I Like You 🙂
+        </p>
+
+        <div class="music-player slide-up delay-3">
+            <div class="controls">
+                <button class="play-btn" id="playPauseBtn" onclick="togglePlay()">
+                    <i class="fas fa-pause"></i>
+                </button>
+                <div class="progress-container">
+                    <input type="range" id="progressBar" value="0" min="0" step="1">
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="durationTime">0:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Anti-Screenshot / Anti-Copy Protections ---
+        // Right Click Disable
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        
+        // Keyboard shortcuts disable (Ctrl+C, Ctrl+U, PrintScreen etc)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c' || e.key === 'p')) {
+                e.preventDefault();
+            }
+            if (e.key === 'PrintScreen') {
+                navigator.clipboard.writeText(''); // Clear clipboard
+                alert('Screenshots are disabled!');
+            }
+        });
+
+        // --- Core Logic ---
+        const audio = document.getElementById('bgMusic');
+        const playBtn = document.getElementById('playPauseBtn');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationTimeEl = document.getElementById('durationTime');
+
+        // Step 1: Hide warning, show login
+        function startExperience() {
+            document.getElementById('earphoneModal').style.display = 'none';
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginScreen').classList.add('slide-up');
+            // Audio load karke pause rakhte hain, taaki browser allow kare
+            audio.load();
+        }
+
+        // Step 2: Password Check
+        function checkPassword() {
+            const pwd = document.getElementById('passwordInput').value.toLowerCase().trim();
+            if (pwd === 'nisha') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('messageScreen').classList.remove('hidden');
+                
+                // Play music on success
+                audio.play();
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                document.getElementById('errorMessage').innerText = "Password galat hai. Try again.";
+                document.getElementById('passwordInput').value = '';
+                setTimeout(() => document.getElementById('errorMessage').innerText = "", 3000);
+            }
+        }
+
+        // --- Audio Player Logic ---
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                audio.pause();
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        }
+
+        // Update progress bar as audio plays
+        audio.addEventListener('timeupdate', () => {
+            if(audio.duration) {
+                const progressPercent = (audio.currentTime / audio.duration) * 100;
+                progressBar.value = progressPercent;
+                currentTimeEl.innerText = formatTime(audio.currentTime);
+            }
+        });
+
+        // Set duration when audio loads
+        audio.addEventListener('loadedmetadata', () => {
+            durationTimeEl.innerText = formatTime(audio.duration);
+        });
+
+        // Seek audio when progress bar is dragged
+        progressBar.addEventListener('input', (e) => {
+            const seekTime = (e.target.value / 100) * audio.duration;
+            audio.currentTime = seekTime;
+        });
+
+        // Format time (seconds to M:SS)
+        function formatTime(timeInSeconds) {
+            const minutes = Math.floor(timeInSeconds / 60);
+            const seconds = Math.floor(timeInSeconds % 60);
+            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+    </script>
+</body>
+
+</html>
